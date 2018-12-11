@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: DATABASE_SERVICE_NAME
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: mysql
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: r00t
+        - name: MYSQL_DATABASE
+          value: springboot_mysql_example
+        ports:
+        - containerPort: 3306
+          name: mysql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-mysql
+  labels:
+    app: spring-boot-mysql
+spec:
+  selector:
+    matchLabels:
+      app: spring-boot-mysql
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: spring-boot-mysql
+      labels:
+        app: spring-boot-mysql
+    spec:
+      containers:
+      - name: webapp
+        imagePullPolicy: Always
+        image: SPRINGBOOT_EXAMPLE_DOCKER_IMAGE
+        env:
+          - name: DATABASE
+            value: DATABASE_SERVICE_NAME
+        ports:
+          - containerPort: 8080
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-mysql 
+  labels:
+    app: spring-boot-mysql
+spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+      name: spring-boot-mysql
+  selector:
+    app: spring-boot-mysql
+  type: LoadBalancer

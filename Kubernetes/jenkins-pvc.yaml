@@ -1,0 +1,16 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jenkins-pvc
+  labels:
+    type: jenkins-volume
+  # annotations:
+  #   volume.beta.kubernetes.io/storage-class: aws-ebs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 17Gi

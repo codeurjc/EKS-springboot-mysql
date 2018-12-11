@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-prod
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: mysql-prod
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  annotations:
+    volume.beta.kubernetes.io/storage-class: aws-ebs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: mysql-prod
+spec:
+  selector:
+    matchLabels:
+      app: mysql-prod
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql-prod
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: mysql-prod
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: r00t
+        - name: MYSQL_DATABASE
+          value: springboot_mysql_example
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-mysql-prod
+  labels:
+    app: spring-boot-mysql-prod
+spec:
+  selector:
+    matchLabels:
+      app: spring-boot-mysql-prod
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: spring-boot-mysql-prod
+      labels:
+        app: spring-boot-mysql-prod
+    spec:
+      containers:
+      - name: webapp
+        imagePullPolicy: Always
+        image: SPRINGBOOT_EXAMPLE_DOCKER_IMAGE
+        env:
+          - name: DATABASE
+            value: db-prod
+        ports:
+          - containerPort: 8080
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 15
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-mysql-prod
+  labels:
+    app: spring-boot-mysql-prod
+spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+      name: spring-boot-mysql
+  selector:
+    app: spring-boot-mysql-prod
+  type: LoadBalancer
