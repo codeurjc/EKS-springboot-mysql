@@ -195,7 +195,7 @@ Persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  StorageClass: "aws-ebs"
+  StorageClass: ""
 
   Annotations: {}
   AccessMode: ReadWriteOnce
