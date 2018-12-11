@@ -11,4 +11,4 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: 17Gi
+      storage: SET_SIZE_IN_GB

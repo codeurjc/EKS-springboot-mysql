@@ -6,7 +6,7 @@ metadata:
     type: jenkins-volume
 spec:
   capacity:
-    storage: 17Gi 
+    storage: SET_SIZE_IN_GB 
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
