@@ -95,7 +95,7 @@ podTemplate(label: worker, containers: [
 
     stage('Waiting for the app to be ready...') {
       container('tools') {
-        sh 'cd tools && ./run.sh '
+        sh 'cd tools && ./run.sh http://spring-boot-mysql:8080A'
       }
     }
     
