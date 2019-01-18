@@ -15,7 +15,7 @@ Nombre del cluster: Fortypersona
 Necesitamos un rol de AWS con capacidad para crear recursos.
 
 ```
-cat >policy<<EOF
+cat >policy.json<<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
