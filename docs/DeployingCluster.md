@@ -142,7 +142,7 @@ Una vez hemos resuelto las dependencias podemos ejecutar:
 
 ## Crear los nodos del cluster
 
-Los nodos del cluster se crean usando una plantilla de CloudFormation que configura un grupo de escalabilidad. Es decir, nos facilita la creación de un cluster dinámico que puede escalar aunque de momento solo escala manualmente.
+Los nodos del cluster se crean usando una plantilla de CloudFormation que configura un grupo de escalabilidad. Es decir, nos facilita la creación de un cluster dinámico que puede escalar aunque de momento solo escala manualmente. Se inicia con un solo modo, si se desean más nodos, ajustar el parámetro `NodeAutoScalingGroupMaxSize`.
 
 Creamos el fichero con los parámetros:
 
@@ -171,7 +171,7 @@ Y creamos el grupo de escalabilidad
 $ aws cloudformation create-stack \
   --stack-name ${CLUSTER_NAME} \
   --template-url https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2018-11-07/amazon-eks-nodegroup.yaml \
-  --parameters file:///home/nordri/Proyectos/2to40/Kubernetes/parameters.json \
+  --parameters file:///PATH/TO/parameters.json \
   --disable-rollback \
   --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 ```
